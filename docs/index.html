@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RasifPortfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
+        #bgCanvas { position: fixed; top:0; left:0; width:100%; height:100%; z-index:-2; }
+
+        .btn-cv { background: linear-gradient(to right, #FFD700, #FF8C00); color:#000; font-weight:bold; }
+        .btn-cv:hover { transform: scale(1.05); color:#fff; }
+
+        .skill-card { transition: transform 0.4s ease, box-shadow 0.4s ease; cursor:pointer; position:relative; overflow:hidden; }
+        .skill-card:hover { transform: translateY(-10px) scale(1.05); box-shadow: 0 15px 25px rgba(0,0,0,0.25); }
+        .skill-card i { transition: color 0.4s ease, transform 0.4s ease, text-shadow 0.4s ease; }
+        .skill-card:hover i { color:#FF8C00; transform: scale(1.3) rotate(-10deg); text-shadow:0 0 10px #FF8C00,0 0 20px #FFA500; }
+
+        .contact-icon { transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease; }
+        .contact-icon:hover { transform: scale(1.4) rotate(10deg); color:#FF8C00; text-shadow:0 0 15px #FF8C00,0 0 25px #FFA500,0 0 35px #FFD700; animation: glow 1.5s infinite alternate; }
+
+        @keyframes glow {
+            0%{text-shadow:0 0 15px #FF8C00,0 0 25px #FFA500,0 0 35px #FFD700;}
+            50%{text-shadow:0 0 25px #FF8C00,0 0 35px #FFA500,0 0 45px #FFD700;}
+            100%{text-shadow:0 0 15px #FF8C00,0 0 25px #FFA500,0 0 35px #FFD700;}
+        }
+
+        .skill-canvas { position:absolute; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; display:none; }
+
+        .hero-bg { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.1); z-index:-1; }
+        .hero-overlay { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:80%; height:auto; background: rgba(0,0,0,0.6); border-radius:12px; z-index:0; }
+        .skills-bg { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.2); z-index:0; }
+
+        .glow-title {
+            color: #FFD700;
+            text-shadow: 2px 2px 0 #000, 4px 4px 10px rgba(0,0,0,0.7), 0 0 5px #FFD700, 0 0 20px #FFD700;
+            animation: glowText 2s infinite alternate;
+        }
+        @keyframes glowText {
+            0% { text-shadow: 2px 2px 0 #000, 4px 4px 10px rgba(0,0,0,0.7), 0 0 5px #FFD700, 0 0 20px #FFD700; }
+            50% { text-shadow: 2px 2px 0 #000, 4px 4px 15px rgba(0,0,0,0.7), 0 0 10px #FFD700, 0 0 25px #FFD700; }
+            100% { text-shadow: 2px 2px 0 #000, 4px 4px 10px rgba(0,0,0,0.7), 0 0 5px #FFD700, 0 0 20px #FFD700; }
+        }
+
+        /* PRO Hamburger */
+        .hamburger {
+          width: 35px;
+          height: 28px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          cursor: pointer;
+          z-index: 10001; /* Menyudan üstün */
+          position: relative;
+        }
+        .hamburger span {
+          display: block;
+          height: 4px;
+          width: 100%;
+          background: #FFD700;
+          border-radius: 2px;
+          transition: all 0.4s ease;
+          box-shadow: 0 0 8px #FFD700, 0 0 16px #FFA500;
+          animation: glow 1.5s infinite alternate;
+        }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(6px,6px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(6px,-6px); }
+        .hamburger.active span:nth-child(1),
+        .hamburger.active span:nth-child(3) {
+            background: #FFD700;
+            box-shadow: 0 0 10px #FFD700, 0 0 20px #FFA500, 0 0 30px #FFD700, 0 0 40px #FFA500;
+        }
+
+        /* Menyu */
+        .mobile-menu-right {
+          position: fixed;
+          top:0;
+          right: -260px;
+          width:250px;
+          height:100vh;
+          background: rgba(0,0,0,0.95);
+          color:#fff;
+          transition: right 0.4s ease;
+          z-index: 9999;
+          padding-top: 70px;
+        }
+        .mobile-menu-right.active { right:0; }
+        .mobile-menu-right a { display:block; padding:15px 25px; font-size:1.2rem; color:#FFD700; text-decoration:none; transition: background 0.3s; }
+        .mobile-menu-right a:hover { background: rgba(255,255,255,0.1); }
+
+        .menu-overlay {
+          position: fixed;
+          top:0; left:0;
+          width:100%; height:100%;
+          background: rgba(0,0,0,0.3);
+          z-index:998;
+          display:none;
+        }
+        .menu-overlay.active { display:block; }
+
+        @keyframes glow {
+          0%{box-shadow:0 0 8px #FFD700,0 0 16px #FFA500;}
+          50%{box-shadow:0 0 16px #FFD700,0 0 32px #FFA500;}
+          100%{box-shadow:0 0 8px #FFD700,0 0 16px #FFA500;}
+        }
+    </style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+
+<!-- Navbar və pro hamburger -->
+<header class="navbar navbar-dark bg-dark fixed-top shadow">
+    <div class="container d-flex align-items-center justify-content-between">
+        <a class="navbar-brand fw-bold" href="#">RasifPortfolio</a>
+        <div id="hamburgerBtn" class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</header>
+
+<!-- Sağdan çıxan pro menyu -->
+<div class="mobile-menu-right" id="mobileMenu">
+    <a href="#skills">Bacarıqlar</a>
+    <a href="#projects">Layihələr</a>
+    <a href="#cv">CV</a>
+    <a href="#links">Əlaqə</a>
+</div>
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- Hero bölməsi -->
+<section class="hero text-center d-flex flex-column justify-content-center align-items-center min-vh-100 position-relative">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <h1 class="text-4xl md:text-6xl font-bold mb-4 position-relative glow-title" style="z-index:1;">Salam, mən Rasif</h1>
+    <p class="text-lg mb-4 position-relative" style="z-index:1;">Java və Web Development üzrə ixtisaslaşmışam.</p>
+    <a href="#projects" class="btn btn-warning btn-lg rounded-pill position-relative" style="z-index:1;">Layihələrə Bax</a>
+</section>
+
+<!-- Bacarıqlar bölməsi -->
+<section id="skills" class="py-5 position-relative">
+    <div class="skills-bg"></div>
+    <div class="container text-center position-relative" style="z-index:1;">
+        <h2 class="text-3xl font-bold mb-5" style="background: rgba(255,255,255,0.85); display:inline-block; padding:0 15px;">Bacarıqlarım</h2>
+        <div class="row g-4 justify-content-center position-relative">
+            <div class="col-6 col-md-3">
+                <div class="p-4 rounded-lg shadow skill-card" style="background: rgba(255,255,255,0.85);">
+                    <i class="fa-brands fa-java fa-2x text-warning"></i>
+                    <p class="mt-2 fw-bold">Java</p>
+                    <canvas class="skill-canvas"></canvas>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-4 rounded-lg shadow skill-card" style="background: rgba(255,255,255,0.85);">
+                    <i class="fa-solid fa-code fa-2x text-primary"></i>
+                    <p class="mt-2 fw-bold">Web</p>
+                    <canvas class="skill-canvas"></canvas>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-4 rounded-lg shadow skill-card" style="background: rgba(255,255,255,0.85);">
+                    <i class="fa-solid fa-database fa-2x text-success"></i>
+                    <p class="mt-2 fw-bold">DB</p>
+                    <canvas class="skill-canvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Layihələr bölməsi -->
+<section id="projects" class="py-5 position-relative">
+    <canvas id="projectsCanvas" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:-1;"></canvas>
+    <div class="container text-center position-relative" style="z-index:1;">
+        <h2 class="text-3xl font-bold mb-5">Layihələrim</h2>
+        <a href="https://github.com/Mirzayev42?tab=repositories" target="_blank" class="btn btn-warning btn-lg rounded-pill px-4 py-2">GitHub-da Layihələrimi Gör</a>
+    </div>
+</section>
+
+<!-- CV bölməsi -->
+<section id="cv" class="py-5 position-relative">
+    <div class="container text-center position-relative" style="z-index:1;">
+        <h2 class="text-3xl font-bold mb-4">CV</h2>
+        <p class="mb-4" style="max-width:600px;margin:0 auto;padding:15px 20px;background: rgba(255,255,255,0.85);border-radius:8px;">Təhsilimi, bacarıqlarımı və iş təcrübəmi daha ətraflı görmək üçün CV-mi Dropbox üzərindən baxa bilərsiniz.</p>
+        <a href="https://drive.google.com/file/d/10Q73HDxkIrysJaHZ-MCHj-mDwB8gp8BA/view?usp=drive_link" target="_blank" class="btn btn-cv rounded-pill px-4 py-2">📄 CV-ə Nəzər Yetir</a>
+    </div>
+</section>
+
+<!-- Əlaqə bölməsi -->
+<section id="links" class="py-5">
+    <div class="container text-center">
+        <h2 class="text-3xl font-bold mb-4">Əlaqə & Sosial</h2>
+        <div class="d-flex justify-content-center gap-4">
+            <a href="mailto:rasifmirzayev313@gmail.com" class="contact-icon"><i class="fa-solid fa-envelope fa-2x"></i></a>
+            <a href="https://www.linkedin.com/in/rasif-mirzayev" class="contact-icon"><i class="fa-brands fa-linkedin fa-2x"></i></a>
+            <a href="https://github.com/Mirzayev42/test.git" class="contact-icon"><i class="fa-brands fa-github fa-2x"></i></a>
+            <a href="https://www.instagram.com/_rasif_o42_/" class="contact-icon"><i class="fa-brands fa-instagram fa-2x"></i></a>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Background words
+    const bgCanvas = document.getElementById('bgCanvas');
+    const bgCtx = bgCanvas.getContext('2d');
+    bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
+    const bgWords = ["Java","Spring","Hibernate","OOP","SQL","API","JVM","Servlet","JSP","Web","Database"];
+    let bgParticles = [];
+    class BgParticle{constructor(t){this.text=t;this.x=Math.random()*bgCanvas.width;this.y=Math.random()*bgCanvas.height;this.speedX=Math.random()*1-0.5;this.speedY=Math.random()*1-0.5;this.fontSize=Math.random()*25+12;this.color=`hsl(${Math.random()*360},70%,60%)`}update(){this.x+=this.speedX;this.y+=this.speedY;if(this.x<0)this.x=bgCanvas.width;if(this.x>bgCanvas.width)this.x=0;if(this.y<0)this.y=bgCanvas.height;if(this.y>bgCanvas.height)this.y=0}draw(){bgCtx.fillStyle=this.color;bgCtx.font=`${this.fontSize}px Arial`;bgCtx.fillText(this.text,this.x,this.y)}}
+    function initBgParticles(){bgParticles=[];for(let i=0;i<60;i++){const word=bgWords[Math.floor(Math.random()*bgWords.length)];bgParticles.push(new BgParticle(word))}}
+    function animateBg(){bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);bgParticles.forEach(p=>{p.update();p.draw()});requestAnimationFrame(animateBg)}
+    initBgParticles();animateBg();
+    window.addEventListener('resize',()=>{bgCanvas.width=window.innerWidth;bgCanvas.height=window.innerHeight;initBgParticles()});
+
+    // Skill particles
+    document.querySelectorAll('.skill-card').forEach(card => {
+      const canvas = card.querySelector('canvas');
+      const ctx = canvas.getContext('2d');
+      function resizeCanvas() { canvas.width = card.offsetWidth; canvas.height = card.offsetHeight; }
+      let particles = [];
+      class Particle { constructor(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.size=Math.random()*3+1;this.speedX=(Math.random()-0.5)*1;this.speedY=(Math.random()-0.5)*1;this.color=`hsl(${Math.random()*30 + 30},100%,50%)`;} update(){this.x+=this.speedX;this.y+=this.speedY;if(this.x<0)this.x=canvas.width;if(this.x>canvas.width)this.x=0;if(this.y<0)this.y=canvas.height;if(this.y>canvas.height)this.y=0;} draw(){ctx.fillStyle=this.color;ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fill();} }
+      function initParticles(){particles=[];for(let i=0;i<30;i++)particles.push(new Particle());}
+      let animating = false; let animationId;
+      function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.update();p.draw();}); animationId=requestAnimationFrame(animate);}
+      card.addEventListener('mouseenter',()=>{
+        resizeCanvas(); initParticles(); canvas.style.display='block';
+        if(!animating){animating=true; animate();}
+      });
+      card.addEventListener('mouseleave',()=>{
+        canvas.style.display='none'; cancelAnimationFrame(animationId); animating=false;
+      });
+      window.addEventListener('resize',resizeCanvas);
+    });
+
+    // PRO Hamburger
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const menuOverlay = document.getElementById('menuOverlay');
+
+    hamburgerBtn.addEventListener('click', () => {
+        hamburgerBtn.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+        menuOverlay.classList.toggle('active');
+    });
+
+    menuOverlay.addEventListener('click', () => {
+        hamburgerBtn.classList.remove('active');
+        mobileMenu.classList.remove('active');
+        menuOverlay.classList.remove('active');
+    });
+</script>
+</body>
+</html>
